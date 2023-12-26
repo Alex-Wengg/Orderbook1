@@ -6,6 +6,7 @@
 #include <vector>
 
 int main() {
+    std::cout << "A what:" << std::endl;
     OrderBook order_book;
 
     std::vector<Quote> limit_orders = {

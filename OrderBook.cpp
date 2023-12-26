@@ -11,7 +11,7 @@
 #include <vector>
 #include <optional>
 
-OrderBook::OrderBook(double tick_size = 0.0001) : last_tick(0), last_timestamp(0), tick_size(tick_size), time(0), next_order_id(0) {}
+OrderBook::OrderBook(double tick_size) : last_tick(0), last_timestamp(0), tick_size(tick_size), time(0), next_order_id(0) {}
 void OrderBook::update_time()
 {
   time++;
@@ -205,7 +205,7 @@ std::pair<std::vector<TradeRecord>, Quote> OrderBook::process_limit_order(
     return {trades, *order_in_book};
   }
 
-void OrderBook::cancel_order(const std::string& side, int order_id, int time = 0) 
+void OrderBook::cancel_order(const std::string& side, int order_id, int time) 
 {
   if (side != "bid" && side != "ask") {
   std::cerr << "cancel_order() given neither \"bid\" nor \"ask\"" << std::endl;

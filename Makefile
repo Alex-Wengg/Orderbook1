@@ -3,7 +3,7 @@ CXXFLAGS = -Wall -g
 
 MAIN = Example
 
-SOURCES = ./Example.cpp ./Order.cpp ./OrderList.cpp ./OrderTree.cpp
+SOURCES = ./Example.cpp ./Order.cpp ./OrderList.cpp ./OrderTree.cpp ./OrderBook.cpp
 
 HEADERS = ./Order.h ./OrderList.h ./OrderTree.h ./OrderBook.h
 

@@ -46,8 +46,7 @@ class OrderBook {
   public:
   OrderTree bids;
   OrderTree asks;
-  OrderBook(double tick_size = 0.0001)
-  : last_tick(0), last_timestamp(0), tick_size(tick_size), time(0), next_order_id(0) {}
+  OrderBook(double tick_size = 0.0001);
 
   void update_time();
 
