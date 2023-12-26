@@ -6,8 +6,6 @@
 #include <string>
 #include <unordered_map>
 
-#include "OrderList.h"
-
 class OrderList;
 
 struct Quote {

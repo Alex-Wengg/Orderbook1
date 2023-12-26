@@ -1,15 +1,18 @@
+#ifndef ORDERTREE_H
+#define ORDERTREE_H
+
 #include<map>
 #include<unordered_map>
 #include<vector>
 
-#include "OrderList.h"
 #include "Order.h"
+#include "OrderList.h"
 
+class Order;
+class OrderList;
 class OrderTree{
 
   private:
-
-
 
   public:
     int volume;
@@ -17,7 +20,7 @@ class OrderTree{
     std::unordered_map<int, Order> order_map;
     int num_orders;
     int depth;
-    
+
     OrderTree();
     size_t size() const;
     OrderList& get_price_list(int price);
@@ -36,3 +39,5 @@ class OrderTree{
     OrderList* max_price_list();
     OrderList* min_price_list();
 };
+
+#endif // ORDERTREE_H

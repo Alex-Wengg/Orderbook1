@@ -2,9 +2,9 @@
 #include<unordered_map>
 #include<vector>
 
-#include "OrderTree.h"
-#include "OrderList.h"
 #include "Order.h"
+#include "OrderList.h"
+#include "OrderTree.h"
 
 OrderTree::OrderTree() : volume(0), num_orders(0), depth(0) {}
 
