@@ -1,2 +1,12 @@
 *.o
 *.exe
+./ccls-cache/*
+.ccls-cache
+replit.nix
+*.exe
+.replit
+
+Example
+main
+quantity
+volume

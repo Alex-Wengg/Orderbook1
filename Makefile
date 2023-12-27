@@ -1,22 +1,15 @@
-CXX = g++
-CXXFLAGS = -Wall -g
+CC = g++
+CFLAGS = -Wall -Wextra
 
-MAIN = Example
+SRCS = Main.cpp OrderBook.cpp OrderTree.cpp Order.cpp OrderList.cpp
+OBJS = $(SRCS:.cpp=.o)
+TARGET = Example.exe
 
-SOURCES = ./Example.cpp ./Order.cpp ./OrderList.cpp ./OrderTree.cpp ./OrderBook.cpp
+$(TARGET): $(OBJS)
+	$(CC) $(CFLAGS) -o $@ $(OBJS)
 
-HEADERS = ./Order.h ./OrderList.h ./OrderTree.h ./OrderBook.h
+%.o: %.cpp
+	$(CC) $(CFLAGS) -c $< -o $@
 
-OBJECTS = $(SOURCES:.cpp=.o)
-
-all: $(MAIN)
-
-%.o: %.cpp $(HEADERS)
-	$(CXX) $(CXXFLAGS) -v -c $< -o $@
-
-$(MAIN): $(OBJECTS)
-	$(CXX) $(CXXFLAGS) -v -o $(MAIN) $(OBJECTS)
-
-# Clean the build directory
 clean:
-	rm -f $(OBJECTS) $(MAIN)  *~
+	rm -f $(OBJS) $(TARGET)

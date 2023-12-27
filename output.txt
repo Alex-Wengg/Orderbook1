@@ -1,0 +1,72 @@
+***Bids***
+5@99/100 - 5
+5@99/102 - 7
+5@98/101 - 6
+5@97/103 - 8
+
+***Asks***
+5@101/100 - 1
+5@101/102 - 3
+5@101/103 - 4
+5@103/101 - 2
+
+***Trades***
+
+
+{'type': 'limit', 'side': 'bid', 'quantity': 2, 'price': 102, 'trade_id': 109}
+Trade occurs as incoming bid limit crosses best ask
+[{'timestamp': 9, 'price': Decimal('101'), 'quantity': 2, 'time': 9, 'party1': [100, 'ask', 1, Decimal('3')], 'party2': [109, 'bid', None, None]}]
+***Bids***
+5@99/100 - 5
+5@99/102 - 7
+5@98/101 - 6
+5@97/103 - 8
+
+***Asks***
+3@101/100 - 1
+5@101/102 - 3
+5@101/103 - 4
+5@103/101 - 2
+
+***Trades***
+2 @ 101 (9) 100/109
+
+
+{'type': 'limit', 'side': 'bid', 'quantity': 50, 'price': 102, 'trade_id': 110}
+Large incoming bid limit crosses best ask. Remaining volume is placed in book.
+[{'timestamp': 10, 'price': Decimal('101'), 'quantity': Decimal('3'), 'time': 10, 'party1': [100, 'ask', 1, None], 'party2': [110, 'bid', None, None]}, {'timestamp': 10, 'price': Decimal('101'), 'quantity': Decimal('5'), 'time': 10, 'party1': [102, 'ask', 3, None], 'party2': [110, 'bid', None, None]}, {'timestamp': 10, 'price': Decimal('101'), 'quantity': Decimal('5'), 'time': 10, 'party1': [103, 'ask', 4, None], 'party2': [110, 'bid', None, None]}]
+***Bids***
+37@102/110 - 10
+5@99/100 - 5
+5@99/102 - 7
+5@98/101 - 6
+5@97/103 - 8
+
+***Asks***
+5@103/101 - 2
+
+***Trades***
+2 @ 101 (9) 100/109
+3 @ 101 (10) 100/110
+5 @ 101 (10) 102/110
+5 @ 101 (10) 103/110
+
+
+A market order takes the specified volume from the inside of the book, regardless of price
+A market ask for 40 results in:
+***Bids***
+2@99/100 - 5
+5@99/102 - 7
+5@98/101 - 6
+5@97/103 - 8
+
+***Asks***
+5@103/101 - 2
+
+***Trades***
+2 @ 101 (9) 100/109
+3 @ 101 (10) 100/110
+5 @ 101 (10) 102/110
+5 @ 101 (10) 103/110
+37 @ 102 (11) 110/111
+3 @ 99 (11) 100/111
