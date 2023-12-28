@@ -32,7 +32,7 @@ struct TradeRecord {
 
 class OrderBook {
 private:
-  std::deque<TradeRecord> tape; // Assuming tape elements are strings
+  std::deque<TradeRecord> tape;
 
   double last_tick;
   int last_timestamp;

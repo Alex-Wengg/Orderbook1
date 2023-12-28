@@ -42,8 +42,8 @@ OrderBook::process_order(Quote &quote, bool from_data, bool verbose) {
   if (order_type == "market") {
     trades = this->process_market_order(quote, verbose);
   } else if (order_type == "limit") {
-    trades = this->process_limit_order(quote, from_data, verbose).first;
-    order_in_book = this->process_limit_order(quote, from_data, verbose).second;
+
+    return this->process_limit_order(quote, from_data, verbose);
   } else {
     std::cerr
         << "order_type for process_order() is neither 'market' nor 'limit'"
@@ -78,6 +78,7 @@ OrderBook::process_order_list(const std::string &side, OrderList &order_list,
     } else if (quantity_to_trade == head_order->quantity) {
       traded_quantity = quantity_to_trade;
       if (side == "bid") {
+
         this->bids.remove_order_by_id(head_order->order_id);
       } else {
         this->asks.remove_order_by_id(head_order->order_id);
@@ -85,11 +86,13 @@ OrderBook::process_order_list(const std::string &side, OrderList &order_list,
       quantity_to_trade = 0;
     } else {
       traded_quantity = head_order->quantity;
+      //
       if (side == "bid") {
         this->bids.remove_order_by_id(head_order->order_id);
       } else {
         this->asks.remove_order_by_id(head_order->order_id);
       }
+      //
       quantity_to_trade -= traded_quantity;
     }
 
@@ -119,6 +122,7 @@ OrderBook::process_order_list(const std::string &side, OrderList &order_list,
       transaction_record.party2 = {std::to_string(quote.trade_id), "bid", "N/A",
                                    "N/A"};
     }
+    tape.push_back(transaction_record);
     trades.push_back(transaction_record);
   }
 
@@ -132,6 +136,8 @@ std::vector<TradeRecord> OrderBook::process_market_order(Quote &quote,
   std::string side = quote.side;
 
   if (side == "bid") {
+    std::cout << " ask.size(): ";
+    std::cout << asks.size() << std::endl;
     while (quantity_to_trade > 0 && asks.size()) {
       OrderList *best_price_asks =
           asks.min_price_list(); // Assuming min_price_list returns a pointer to
@@ -142,19 +148,21 @@ std::vector<TradeRecord> OrderBook::process_market_order(Quote &quote,
       auto [remaining_quantity, new_trades] = process_order_list(
           "ask", *best_price_asks, quantity_to_trade, quote, verbose);
       quantity_to_trade = remaining_quantity;
+
       trades.insert(trades.end(), new_trades.begin(), new_trades.end());
     }
   } else if (side == "ask") {
+
     while (quantity_to_trade > 0 && bids.size()) {
-      OrderList *best_price_bids =
-          bids.max_price_list(); // Assuming max_price_list returns a pointer to
-                                 // OrderList
+      OrderList *best_price_bids = bids.max_price_list();
+
       if (!best_price_bids) {
-        break; // No bids available
+        break;
       }
       auto [remaining_quantity, new_trades] = process_order_list(
           "bid", *best_price_bids, quantity_to_trade, quote, verbose);
       quantity_to_trade = remaining_quantity;
+
       trades.insert(trades.end(), new_trades.begin(), new_trades.end());
     }
   } else {
@@ -169,6 +177,7 @@ std::vector<TradeRecord> OrderBook::process_market_order(Quote &quote,
 
 std::pair<std::vector<TradeRecord>, Quote>
 OrderBook::process_limit_order(Quote &quote, bool from_data, bool verbose) {
+
   std::vector<TradeRecord> trades;
   int quantity_to_trade = quote.quantity;
   std::string side = quote.side;
@@ -178,9 +187,7 @@ OrderBook::process_limit_order(Quote &quote, bool from_data, bool verbose) {
   if (side == "bid") {
     while (asks.size() && price >= asks.min_price() && quantity_to_trade > 0) {
       OrderList *best_price_asks = asks.min_price_list();
-      if (!best_price_asks) {
-        break; // No asks available
-      }
+
       auto [remaining_quantity, new_trades] = process_order_list(
           "ask", *best_price_asks, quantity_to_trade, quote, verbose);
       quantity_to_trade = remaining_quantity;
@@ -198,9 +205,7 @@ OrderBook::process_limit_order(Quote &quote, bool from_data, bool verbose) {
 
     while (bids.size() && price <= bids.max_price() && quantity_to_trade > 0) {
       OrderList *best_price_bids = bids.max_price_list();
-      if (!best_price_bids) {
-        break; // No bids available
-      }
+
       auto [remaining_quantity, new_trades] = process_order_list(
           "bid", *best_price_bids, quantity_to_trade, quote, verbose);
       quantity_to_trade = remaining_quantity;
@@ -211,9 +216,10 @@ OrderBook::process_limit_order(Quote &quote, bool from_data, bool verbose) {
         quote.order_id = next_order_id++;
       }
       quote.quantity = quantity_to_trade;
-
+      ////////
       asks.insert_order(&quote);
       order_in_book = quote;
+      ////////
     }
   } else {
     std::cerr << "process_limit_order() received neither 'bid' nor 'ask'"
@@ -326,7 +332,7 @@ std::string OrderBook::toString() const {
   ss << "***Bids***\n";
   if (bids.price_map.size()) {
     for (auto it = bids.price_map.rbegin(); it != bids.price_map.rend(); ++it) {
-      ss << it->second.toString() << '\n';
+      ss << it->second.toString();
     }
   }
   /*
@@ -336,17 +342,18 @@ std::string OrderBook::toString() const {
   ss << "\n***Asks***\n";
   if (asks.price_map.size()) {
     for (auto &pair : asks.price_map) {
-      ss << pair.second.toString() << '\n';
+      ss << pair.second.toString();
     }
   }
 
   ss << "\n***Trades***\n";
-  if (tape.size()) {
+
+  if (tape.size() != 0) {
     int num = 0;
-    for (const auto &entry : tape) {
+    for (auto entry : tape) {
       if (num < 10) { // get last 10 entries
         ss << entry.quantity << " @ " << entry.price << " (" << entry.timestamp
-           << ") " << entry.party1[0] << "/" << entry.party2[0] << "\n";
+           << ") " << entry.party1[0] << "/" << entry.party2[0] << " \n ";
         ++num;
       } else {
         break;

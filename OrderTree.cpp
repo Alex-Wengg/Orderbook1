@@ -12,7 +12,7 @@ size_t OrderTree::size() const { return this->order_map.size(); }
 
 OrderList &OrderTree::get_price_list(int price) { return price_map.at(price); }
 
-Order &OrderTree::get_order(int order_id) { return order_map.at(order_id); }
+Order &OrderTree::get_order(int order_id) { return *order_map.at(order_id); }
 
 void OrderTree::create_price(int price) {
   this->depth += 1;
@@ -20,8 +20,11 @@ void OrderTree::create_price(int price) {
 }
 
 void OrderTree::remove_price(int price) {
-  this->depth -= 1;
-  this->price_map.erase(price);
+  auto it = this->price_map.find(price);
+  if (it != this->price_map.end()) {
+    this->depth -= 1;
+    this->price_map.erase(it);
+  }
 }
 
 bool OrderTree::price_exists(double price) {
@@ -46,44 +49,49 @@ void OrderTree::insert_order(Quote *quote) {
   Order *newOrder = new Order(quote, &price_map[quote->price]);
 
   price_map[quote->price].append_order(newOrder);
-  std::unordered_map<int, Order> order_map;
-
-  order_map.emplace(newOrder->order_id, *newOrder);
+  order_map.emplace(quote->order_id, newOrder);
   volume += newOrder->quantity;
 }
 
 void OrderTree::update_order(Quote *order_update) {
-  Order order = order_map.at(order_update->order_id);
+  Order *order = order_map.at(order_update->order_id);
   int originalQuantity = order_update->quantity;
 
-  if (order_update->price != order.price) {
-    OrderList orderList = price_map.at(order.price);
-    orderList.remove_order(&order);
+  if (order_update->price != order->price) {
+    OrderList orderList = price_map.at(order->price);
+    orderList.remove_order(order);
     if (orderList.size() == 0) {
-      this->remove_price(order.price);
+      this->remove_price(order->price);
     }
 
     this->insert_order(order_update);
   } else {
-    order.update_quantity(order_update->quantity, order_update->timestamp);
+    order->update_quantity(order_update->quantity, order_update->timestamp);
   }
-  volume += order.quantity - originalQuantity;
+  volume += order->quantity - originalQuantity;
 }
 
 void OrderTree::remove_order_by_id(int order_id) {
   this->num_orders--;
-  Order &order = order_map.at(order_id);
+  if (order_map.find(order_id) == order_map.end()) {
+    return;
+  }
+  Order *order = order_map.at(order_id);
 
-  this->volume -= order.quantity;
+  this->volume -= order->quantity;
 
-  OrderList &orderList = price_map.at(order.price);
-  orderList.remove_order(&order);
+  OrderList &orderList = price_map.at(order->price);
+  orderList.remove_order(order);
 
   if (orderList.size() == 0) {
-    remove_price(order.price);
+    remove_price(order->price);
   }
 
-  order_map.erase(order_id);
+  auto it = order_map.find(order_id);
+  if (it != order_map.end()) {
+    delete it->second;
+    order_map.erase(it);
+  }
 }
 
 double OrderTree::max_price() {
