@@ -44,7 +44,7 @@ public:
 
   Order *get_head_order();
   void append_order(Order *order);
-  void remove_order(Order* order);
+  void remove_order(Order *order);
   void move_to_tail(Order *order);
   std::string toString() const;
 };

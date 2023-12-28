@@ -45,7 +45,6 @@ void OrderTree::insert_order(Quote *quote) {
     create_price(quote->price);
   }
 
-  // Order newOrder(quote, &price_map[quote->price]);
   Order *newOrder = new Order(quote, &price_map[quote->price]);
 
   price_map[quote->price].append_order(newOrder);
@@ -72,26 +71,20 @@ void OrderTree::update_order(Quote *order_update) {
 }
 
 void OrderTree::remove_order_by_id(int order_id) {
-  this->num_orders--;
   if (order_map.find(order_id) == order_map.end()) {
     return;
   }
-  Order *order = order_map.at(order_id);
 
-  this->volume -= order->quantity;
+  num_orders--;
+  Order *order = order_map[order_id];
+  volume -= order->quantity;
+  order->order_list->remove_order(order);
 
-  OrderList &orderList = price_map.at(order->price);
-  orderList.remove_order(order);
-
-  if (orderList.size() == 0) {
+  if (order->order_list->size() == 0) {
     remove_price(order->price);
   }
 
-  auto it = order_map.find(order_id);
-  if (it != order_map.end()) {
-    delete it->second;
-    order_map.erase(it);
-  }
+  // order_map.erase(order_id);
 }
 
 double OrderTree::max_price() {
@@ -124,4 +117,14 @@ OrderList *OrderTree::min_price_list() {
   } else {
     return nullptr;
   }
+}
+
+OrderTree::~OrderTree() {
+  for (auto &pair : order_map) {
+    delete pair.second;
+  }
+
+  order_map.clear();
+
+  price_map.clear();
 }

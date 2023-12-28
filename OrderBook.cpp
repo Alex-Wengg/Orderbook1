@@ -40,6 +40,7 @@ OrderBook::process_order(Quote &quote, bool from_data, bool verbose) {
   std::vector<TradeRecord> trades;
 
   if (order_type == "market") {
+    // issue
     trades = this->process_market_order(quote, verbose);
   } else if (order_type == "limit") {
 
@@ -86,13 +87,12 @@ OrderBook::process_order_list(const std::string &side, OrderList &order_list,
       quantity_to_trade = 0;
     } else {
       traded_quantity = head_order->quantity;
-      //
       if (side == "bid") {
         this->bids.remove_order_by_id(head_order->order_id);
       } else {
         this->asks.remove_order_by_id(head_order->order_id);
       }
-      //
+
       quantity_to_trade -= traded_quantity;
     }
 
@@ -136,14 +136,11 @@ std::vector<TradeRecord> OrderBook::process_market_order(Quote &quote,
   std::string side = quote.side;
 
   if (side == "bid") {
-    std::cout << " ask.size(): ";
-    std::cout << asks.size() << std::endl;
     while (quantity_to_trade > 0 && asks.size()) {
-      OrderList *best_price_asks =
-          asks.min_price_list(); // Assuming min_price_list returns a pointer to
-                                 // OrderList
+      OrderList *best_price_asks = asks.min_price_list();
+
       if (!best_price_asks) {
-        break; // No asks available
+        break;
       }
       auto [remaining_quantity, new_trades] = process_order_list(
           "ask", *best_price_asks, quantity_to_trade, quote, verbose);
@@ -168,8 +165,7 @@ std::vector<TradeRecord> OrderBook::process_market_order(Quote &quote,
   } else {
     std::cerr << "process_market_order() received neither 'bid' nor 'ask'"
               << std::endl;
-    std::exit(EXIT_FAILURE); // Consider using exceptions or error codes for
-                             // error handling
+    std::exit(EXIT_FAILURE);
   }
 
   return trades;
@@ -202,7 +198,7 @@ OrderBook::process_limit_order(Quote &quote, bool from_data, bool verbose) {
       order_in_book = quote;
     }
   } else if (side == "ask") {
-
+    // issue
     while (bids.size() && price <= bids.max_price() && quantity_to_trade > 0) {
       OrderList *best_price_bids = bids.max_price_list();
 
@@ -216,15 +212,13 @@ OrderBook::process_limit_order(Quote &quote, bool from_data, bool verbose) {
         quote.order_id = next_order_id++;
       }
       quote.quantity = quantity_to_trade;
-      ////////
       asks.insert_order(&quote);
       order_in_book = quote;
-      ////////
     }
   } else {
     std::cerr << "process_limit_order() received neither 'bid' nor 'ask'"
               << std::endl;
-    std::exit(EXIT_FAILURE); // Consider using exceptions for error handling
+    std::exit(EXIT_FAILURE);
   }
 
   return {trades, *order_in_book};
@@ -247,23 +241,21 @@ void OrderBook::modify_order(int order_id, const Quote &order_update,
   }
 
   std::string side = order_update.side;
-  // Assuming Quote has order_id and timestamp as its members
   Quote updated_order = order_update;
   updated_order.order_id = order_id;
   updated_order.timestamp = this->time;
 
   if (side == "bid") {
     if (bids.order_exists(order_id)) {
-      bids.update_order(&updated_order); // Assuming update_order method exists
+      bids.update_order(&updated_order);
     }
   } else if (side == "ask") {
     if (asks.order_exists(order_id)) {
-      asks.update_order(&updated_order); // Assuming update_order method exists
+      asks.update_order(&updated_order);
     }
   } else {
     std::cerr << "modify_order() given neither 'bid' nor 'ask'" << std::endl;
-    std::exit(EXIT_FAILURE); // Consider using exceptions or other error
-                             // handling techniques
+    std::exit(EXIT_FAILURE);
   }
 }
 
@@ -281,8 +273,7 @@ int OrderBook::get_volume_at_price(const std::string &side, double price) {
   } else {
     std::cerr << "get_volume_at_price() given neither 'bid' nor 'ask'"
               << std::endl;
-    std::exit(EXIT_FAILURE); // Consider using exceptions or other error
-                             // handling techniques
+    std::exit(EXIT_FAILURE);
   }
 
   return volume;
@@ -351,7 +342,7 @@ std::string OrderBook::toString() const {
   if (tape.size() != 0) {
     int num = 0;
     for (auto entry : tape) {
-      if (num < 10) { // get last 10 entries
+      if (num < 10) {
         ss << entry.quantity << " @ " << entry.price << " (" << entry.timestamp
            << ") " << entry.party1[0] << "/" << entry.party2[0] << " \n ";
         ++num;

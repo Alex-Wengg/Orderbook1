@@ -37,6 +37,8 @@ public:
   double min_price();
   OrderList *max_price_list();
   OrderList *min_price_list();
+
+  ~OrderTree();
 };
 
 #endif // ORDERTREE_H
