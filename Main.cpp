@@ -26,24 +26,24 @@ int main() {
             << std::endl;
   std::cout << order_book.toString() << std::endl;
 
-  // // issues
+  // issues
   Quote big_crossing_limit_order = {"limit", "bid", 50, 102, 110};
   auto [trades, order_in_book] =
       order_book.process_order(big_crossing_limit_order, false, false);
-  std::cout << "Large incoming bid limit crosses best ask. Remaining volume is placed in book."
+  std::cout << "Large incoming bid limit crosses best ask. Remaining volume  is placed in book."
             << std::endl;
 
   for (const auto &trade : trades) {
     std::cout << trade.toString() << std::endl;
   }
   std::cout << order_book.toString() << std::endl;
+  //issue 2
 
-  Quote market_order = {"market", "ask", 40, 102, 111};
+      Quote market_order = {"market", "ask", 40, 102, 111};
 
   auto [market_trades, market_order_id] =
       order_book.process_order(market_order, false, false);
-  std::cout << "A market order takes the specified volume from the inside of";
-  std::cout << "the book, regardless of price" << std::endl;
+  std::cout << "A market order takes the specified volume from the inside  of "; std::cout << " the book,  regardless of price " << std::endl; 
   std::cout << "A market ask for 40 results in:" << std::endl;
 
   std::cout << order_book.toString() << std::endl;

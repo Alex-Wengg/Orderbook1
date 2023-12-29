@@ -71,6 +71,8 @@ void OrderTree::update_order(Quote *order_update) {
 }
 
 void OrderTree::remove_order_by_id(int order_id) {
+  std::cout << (order_map.find(order_id) == order_map.end()) << std::endl;
+
   if (order_map.find(order_id) == order_map.end()) {
     return;
   }

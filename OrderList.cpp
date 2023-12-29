@@ -43,7 +43,6 @@ void OrderList::remove_order(Order *order) {
     next_order->prev_order = prev_order;
     prev_order->next_order = next_order;
   } else if (next_order != nullptr) {
-
     next_order->prev_order = nullptr;
     this->head_order = next_order;
   } else if (prev_order != nullptr) {
@@ -51,8 +50,6 @@ void OrderList::remove_order(Order *order) {
     prev_order->next_order = nullptr;
     this->tail_order = prev_order;
   }
-
-  // delete order;
 }
 
 void OrderList::move_to_tail(Order *order) {

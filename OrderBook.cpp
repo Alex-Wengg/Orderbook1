@@ -40,7 +40,6 @@ OrderBook::process_order(Quote &quote, bool from_data, bool verbose) {
   std::vector<TradeRecord> trades;
 
   if (order_type == "market") {
-    // issue
     trades = this->process_market_order(quote, verbose);
   } else if (order_type == "limit") {
 
@@ -72,20 +71,22 @@ OrderBook::process_order_list(const std::string &side, OrderList &order_list,
     int traded_quantity = 0;
 
     if (quantity_to_trade < head_order->quantity) {
+
       traded_quantity = quantity_to_trade;
       new_book_quantity = head_order->quantity - quantity_to_trade;
       head_order->update_quantity(new_book_quantity, head_order->timestamp);
       quantity_to_trade = 0;
     } else if (quantity_to_trade == head_order->quantity) {
       traded_quantity = quantity_to_trade;
-      if (side == "bid") {
 
+      if (side == "bid") {
         this->bids.remove_order_by_id(head_order->order_id);
       } else {
         this->asks.remove_order_by_id(head_order->order_id);
       }
       quantity_to_trade = 0;
     } else {
+
       traded_quantity = head_order->quantity;
       if (side == "bid") {
         this->bids.remove_order_by_id(head_order->order_id);
@@ -149,7 +150,6 @@ std::vector<TradeRecord> OrderBook::process_market_order(Quote &quote,
       trades.insert(trades.end(), new_trades.begin(), new_trades.end());
     }
   } else if (side == "ask") {
-
     while (quantity_to_trade > 0 && bids.size()) {
       OrderList *best_price_bids = bids.max_price_list();
 
@@ -183,7 +183,8 @@ OrderBook::process_limit_order(Quote &quote, bool from_data, bool verbose) {
   if (side == "bid") {
     while (asks.size() && price >= asks.min_price() && quantity_to_trade > 0) {
       OrderList *best_price_asks = asks.min_price_list();
-
+      std::cout << (best_price_asks == nullptr ? "NULL" : "SOMETRHING ")
+                << std::endl;
       auto [remaining_quantity, new_trades] = process_order_list(
           "ask", *best_price_asks, quantity_to_trade, quote, verbose);
       quantity_to_trade = remaining_quantity;
@@ -198,7 +199,6 @@ OrderBook::process_limit_order(Quote &quote, bool from_data, bool verbose) {
       order_in_book = quote;
     }
   } else if (side == "ask") {
-    // issue
     while (bids.size() && price <= bids.max_price() && quantity_to_trade > 0) {
       OrderList *best_price_bids = bids.max_price_list();
 
